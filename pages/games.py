@@ -20,7 +20,7 @@ Som kan tydas av grafen så är det vanligaste snittet cirka 30 minuter.""")
 st.pyplot(fig6)
 
 st.write("""Det finns flera variabler som kan avgöra hur länge en match varar men en hypotes som antogs för denna analys var att:
-* Ju lägre level en spelare har (alltså hur mycket tid de spenderat i spelet) ju längre.
+* Ju lägre level en spelare har (alltså hur mycket tid de spenderat i spelet) ju längre tid tar en match.
 
 Anledning till denna hypotes skulle vara att de höglvlade spelarna dels:
 * Kan kontrollera matchen om de får ledningen och avsluta snabbare genom att fatta rätt beslut.
