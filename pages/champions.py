@@ -6,11 +6,10 @@ from pipeline import graphs, get_cleaned_data
 
 df, df_filtered, mode_counts, stats, df_classic, top_10_wins, bottom_10_wins, df_champions, df_duration, df_match_agg = get_cleaned_data()
 
+fig1, fig2, fig3, fig4, fig5, fig6, fig_agg = graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_duration, df_match_agg, df_classic)
+
+
 st.header('Champions statistics')
-st.info("""
-**Viktig påminelse**
-Detta dataset är inte uttömmande.
-Det är en liten representation av matcher från år 2025 i EUNE (EUROPE NORTH AND EAST).""")
 
 st.write("""I ett spel som Leauge Of Legends så finns det ett stort urval av champions en spelare kan välja på.
 Det som kan vara svårt för ett spel är hur dessa champions förhåller sig i styrka till varandra.
@@ -18,17 +17,14 @@ Som vi kan se i de två graferna under så skiljer sig procenten av antal vinste
 
 st.write("""Frågan vi ställer oss i denna del av analysen är alltså, hur balanserat är spelet när det kommer till deras champions?""")
 
-if not top_10_wins.empty:
-    fig1, fig2, fig3, fig4, fig5, fig6, fig_agg = graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_duration, df_match_agg, df_classic)
-
-    st.pyplot(fig3)
+st.pyplot(fig3)
 
 st.write("""Vid en första titt på datan hade man troligen konstaterat att detta spelet inte är så balanserat.
 Är det ok att en champion har cirka 63% win rate medans en annan har cirka 37 %?
 Troligtvis hade de som spelar detta spelet klagat något enormt om detta var fallet.
 
 Men om vi tar en titt på win rate i förhållande till antal matcher en champion spelat, hur föhåller det sig då?
-Ta en kik på tabellen nedan och sortera efter antal spelade matcher så ser du vilken stor spridning det finns i datasetet.""")
+Ta en kik på tabellen nedan för att se den stora spridningen som finns i datasetet.""")
 
 # I hide index to solve issue with name being double displayed as df_champion has been merged on "champion".
 # Since it has been merged the names of champion is in index
