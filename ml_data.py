@@ -9,12 +9,13 @@ import streamlit as st
 
 @st.cache_data
 def prepare_ml_data(df_classic):
-    """Preparing team statistics and counting diff with focus on team 1."""
+    """Preparing team statistics and counting diff with focus on team 1.
+    The goal is to predict 't1_win' based on the performance difference between the two teams."""
     df_classic = df_classic.fillna(0)
     # Some columns contains
     numerical_columns = df_classic.select_dtypes(include=['number']).columns.tolist()
 
-
+    # Agg for individual player stats into team-level stats
     aggregation_rules = {
         'game_start_utc': 'first',
         'game_minutes': 'first',
@@ -54,11 +55,13 @@ def prepare_ml_data(df_classic):
     # Group the new data in two rows per game (one for each team)
     team_df = df_classic.groupby(['game_id', 'team_id']).agg(aggregation_rules).reset_index()
 
-    # Grouping the game by the team ID.
+    # Grouping the game by the team ID and adding corresponding team name t1/t2
     team1 = team_df[team_df['team_id'] == 100].add_prefix('t1_')
     team2 = team_df[team_df['team_id'] == 200].add_prefix('t2_')
 
-    # Merging the two rows together with the game id
+    # Merging the two rows together with the game id.
+    # Inner join ensures we only analyze complete matches.
+    # If data for one team is missing, that match is discarded to prevent incomplete feature differences.
     merged_df = pd.merge(
         team1,
         team2,
@@ -80,11 +83,13 @@ def prepare_ml_data(df_classic):
     X = merged_df[X_columns]
     y = merged_df['t1_win']
 
-    # Added a test to see that all was merged correctly
+    # Added a test to see that all was merged correctly and the rows with the game_id is the same.
     test_passed = (merged_df['t1_game_id'] == merged_df['t2_game_id']).all()
     num_matches = len(merged_df)
 
+    # Splitting the set with 80 % for train and val and 20 for test.
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     return X_train, X_test, y_train, y_test, test_passed, num_matches
 
 
@@ -92,7 +97,15 @@ def prepare_ml_data(df_classic):
 # False on show spinner because I don't want the run_grid_search to be shown but rather a customized message.
 @st.cache_resource(show_spinner=False)
 def run_grid_search(X_train, y_train, features_names):
-    """Run GridSearch and save it in cache so it doesn't need to re-run everytime."""
+    """Run GridSearch and save it in cache so it doesn't need to re-run everytime.
+    Feature names argument is used here for the cache as the code later has 'X_train.columns.tolist()'.
+    This is used because grid search takes long time to run and for streamlit to remember if it was already run it
+    only needs to look at a list of str instead of a whole dataset.
+    """
+
+    # Max_depth is used in between 10-15 to not let the ML look to deep into the data and "learn" too much of a specifics teams performance.
+    # Min_samples chosen to force it to go through more nodes and not base a decision to few matches
+    # Estimators chosen between 100-150 as industry standard is 100 and adding a between to 150 to find other results.
     param_grid = {
         'max_depth': [10, 12, 15],
         'min_samples_split': [4, 5, 6],
@@ -113,17 +126,18 @@ def get_ml_results(df_classic, selected_features=None):
 
     # If selected features -> use only
     if selected_features:
-
+        # Selecting only the diff columns.
         features_to_use = [f"{f}_diff" for f in selected_features if f"{f}_diff" in X_train_full.columns]
+        # Seperating for train and test again
         X_train_full = X_train_full[features_to_use]
         X_test = X_test[features_to_use]
 
-    # Split for validation
+    # Split for validation (25%)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train_full, y_train_full, test_size=0.25, random_state=42
     )
 
-    # Träna modellen - feature_names ser till att cachen vet vilken modell som är vilken
+    # Training the model and retrieving the columns list for the previous mentioned cache.
     grid_search = run_grid_search(X_train, y_train, X_train.columns.tolist())
     best_rf = grid_search.best_estimator_
 
@@ -131,6 +145,7 @@ def get_ml_results(df_classic, selected_features=None):
     val_acc = accuracy_score(y_val, best_rf.predict(X_val))
     test_acc = accuracy_score(y_test, best_rf.predict(X_test))
 
+    # Getting the importances and it's features.
     importances = pd.DataFrame({
         'feature': X_train.columns,
         'importance': best_rf.feature_importances_ * 100
@@ -155,6 +170,8 @@ def get_ml_results(df_classic, selected_features=None):
         ax.bar_label(container, padding=5, fmt='%.2f%%')
 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+    ax.set_xlabel('Feature')
+    ax.set_ylabel('Importance')
     plt.tight_layout()
 
     return fig, results
