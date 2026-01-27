@@ -92,17 +92,12 @@ def get_cleaned_data():
 
     df_match_agg.columns = ['game_id', 'total_match_kills', 'avg_summoner_level', 'game_minutes']
 
-    # Bins is taken here from the median of the summoner lvl of the players in the data.
-    # The summoner level per person ranges from 0 - 2000 +.
-    # For the analysis the importance was to find a balance in the groups and a way of highlighting the high level ones.
-    # The developers Riot probably have some sort of matchmaking system to not get to high differences and this categories
-    # tries to still find the highest ones.
+    # We bin 'summoner_level' to analyze if player experience correlates with match duration.
+    # The bins are strategically chosen to separate new/casual players from 'high-level'
+    # veterans, aiming for balanced group sizes based on the dataset distribution.
     bins = [0, 300,700, 3000]
-    labels = ['Low Level (0-385)', 'Mid level (386-700)', 'High Level (701+)']
+    labels = ['Low Level (0-300)', 'Mid level (301-700)', 'High Level (701+)']
     df_match_agg['level_group'] = pd.cut(df_match_agg['avg_summoner_level'], bins=bins, labels=labels)
-
-
-
 
 
     return df, df_filtered_time, mode_counts, stats, df_classic, top_10_wins, bottom_10_wins, df_champions, df_duration, df_match_agg
@@ -113,6 +108,7 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
 #----------------------DATA CLEANING GRAPHS-------------------------------
     fig1, ax1 = plt.subplots(figsize=(8, 4))
 
+    # Simple barplot to show how many games in the dataset exists in each group were focus will be on the matchtyp "Full Game"
     sns.barplot(
         data=stats,
         x='Matchtyp',
@@ -126,11 +122,13 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
     ax1.set_xlabel('Typ av match', fontsize=12)
     ax1.set_ylabel('Antal matcher', fontsize=12)
 
+    # Method for showing the actual data on top of the bars (number of games in each group)
     for i, count in enumerate(stats['Antal']):
         plt.text(i, count + 0.1, str(count), ha='center')
 
     fig2, ax2 = plt.subplots(figsize=(8, 4))
 
+    # Same logic as the above mentioned one to show the different modes the data set contains
     sns.barplot(
         data=mode_counts,
         x='Game Mode',
@@ -151,6 +149,9 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
 
 #--------------------------CHAMPION GRAPHS----------------------------
     fig3, (ax_top, ax_bot) = plt.subplots(1, 2, figsize=(13, 4))
+
+    # Using two barplots with two different ax to be shown next to eachother. This to show a first
+    # view of how the win percentage is for the champs without taking other parameters into consideration.
     sns.barplot(
         data=top_10_wins,
         hue="Champion",
@@ -159,14 +160,8 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
         ax=ax_top,
         palette='viridis',
         legend=False)
-    ax_top.set(xlabel='Win Rate (%)')
+    ax_top.set_xlabel('Win Rate (%)')
     ax_top.set_ylabel('Champion + games played')
-
-    for container in ax_top.containers:
-        ax_top.bar_label(container, padding=5, fmt='%.1f%%')
-
-    plt.xlim(0, top_10_wins['Win Rate'].max() + 10)
-
     ax_top.set_title('Tio bästa champions (2025)', fontsize=16)
 
     sns.barplot(
@@ -178,19 +173,27 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
             palette='magma',
             legend=False)
 
-    ax_bot.set(xlabel='Win Rate (%)')
-    ax_bot.set_ylabel('Champion + games played')
 
+    ax_bot.set_ylabel('Champion + games played')
     ax_bot.set_title('Tio sämsta champions (2025)', fontsize=16)
     ax_bot.set_xlabel('Win Rate (%)')
 
+    # Throughout many of the graphs this method is chosen to be able to display the actual percentage to help
+    # the viewer see more clearly
+    for ax in [ax_top, ax_bot]:
+        # Add percentage labels to the end of each bar for immediate readability
+        for container in ax.containers:
+            ax.bar_label(container, padding=5, fmt='%.1f%%')
 
-    for container in ax_bot.containers:
-        ax_bot.bar_label(container, padding=5, fmt='%.1f%%')
+        # Expand the X-axis slightly to ensure the bar labels don't get cut off
+        current_max = max(top_10_wins['Win Rate'].max(), bottom_10_wins['Win Rate'].max())
+        ax.set_xlim(0, current_max + 15)
+
 
     plt.tight_layout()
 
-
+    # Decision made to use scatterplot to see the distribution of the champions and ther played games vs winrate.
+    # Helps the analysis to see patterns.
     fig4, ax3 = plt.subplots(figsize=(10, 6))
     sns.scatterplot(
         data=df_champions,
@@ -207,7 +210,8 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
 
     fig5, ax4 = plt.subplots(figsize=(10, 6))
 
-
+    # Using a regplot to visualize the correlation (trendline) between a champion's
+    # popularity and their win rate. This helps making it even clearer after seeing the scatterplot
     sns.regplot(
         data=df_champions,
         x='Total Games',
@@ -223,7 +227,9 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
 #--------------------------------Game statistic graphs----------------------------------------
     fig6, ax5 = plt.subplots(figsize=(10, 6))
 
-
+    # A histogram is used to visualize the
+    # distribution of match lengths. This helps identify the most common game
+    # duration and the spread of the data (variance).
     sns.histplot(
         data=df_duration,
         x='game_minutes',
@@ -241,6 +247,11 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
 
 
     fig_agg, ax_agg = plt.subplots(figsize=(10, 6))
+
+    # A boxplot is chosen to compare match duration across player level groups.
+    # This visualization is superior to a simple bar chart because it displays
+    # the median, spread (IQR), and outliers, revealing if more experienced
+    # players tend to finish matches faster or more consistently.
     sns.boxplot(
         data=df_match_agg,
         x='level_group',
@@ -248,7 +259,12 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
         palette='viridis',
         ax=ax_agg)
     ax_agg.set_title('Längden av en match baserat på spelarnas genomsnittliga level')
+    ax_agg.set_xlabel('Level gruppering')
+    ax_agg.set_ylabel('Minuter (Duration)')
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig_agg
+
+
+
 
 
