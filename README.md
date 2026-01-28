@@ -11,10 +11,10 @@ Målet är att analysera, visualisera och applicera ML för att skapa förståel
 
 Följande ordning av filer är även rekommendation för läsaren att gå igenom.
 
-*pipeline.py – hanterar inläsning av data, data cleaning, nya beräkningar samt skapande av figurer som anropas till streamlitsidorna (dessa ligger i pages) för att hålla dessa renare.
-ml_data.py – hanterar allt som handlar om ML, hämtar rätt data från pipeline, skapar ML logik inkluderat med train,val,test och gridsearch. Returnerar data och figurer som anropas till rätt streamlitsida (ml.py i pages)
-navigator.py – innehåller sidostruktur för hemsida och är även denna som körs i streamlit som hämtar allt från sidorna i pages.
-league_data_fast.csv – CSV fil med rådata som hämtas in i pipeline.py.*
+*pipeline.py – hanterar inläsning av data, data cleaning, nya beräkningar samt skapande av figurer som anropas till streamlitsidorna (dessa ligger i pages) för att hålla dessa renare.*
+*ml_data.py – hanterar allt som handlar om ML, hämtar rätt data från pipeline, skapar ML logik inkluderat med train,val,test och gridsearch. Returnerar data och figurer som anropas till rätt streamlitsida (ml.py i pages)*
+*navigator.py – innehåller sidostruktur för hemsida och är även denna som körs i streamlit som hämtar allt från sidorna i pages.*
+*league_data_fast.csv – CSV fil med rådata som hämtas in i pipeline.py.*
 
 pages:
 
