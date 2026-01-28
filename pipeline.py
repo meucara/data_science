@@ -30,6 +30,7 @@ def get_cleaned_data():
     # Using the function and creating a new column for the game_type
     df['game_type'] = df['game_duration'].apply(classify_game)
 
+    # Decided to create for minutes instead as it is easier for viewers to read.
     df['game_minutes'] = df['game_duration'] / 60
 
     # New DF with only unique games. Original DF contains 10 rows for each game(for every player in game).
@@ -50,7 +51,7 @@ def get_cleaned_data():
     mode_counts.columns = ['Game Mode', 'Antal']
     mode_counts['Total'] = mode_counts['Antal'].agg(lambda x: sum(x))
 
-#----------------------------A DF WITH ALL THE CLEANING (ONLY FULL GAME AND CLASSIC GAME MODE-------------------------
+#----------------------------A DF WITH ALL THE CLEANING (ONLY FULL GAME AND CLASSIC GAME MODE)-------------------------
     df_classic = df_filtered_time[df_filtered_time['game_mode'] == 'CLASSIC'].copy()
 
 #-----------------------------CHAMPION STATISTICS--------------------------------------
@@ -66,6 +67,9 @@ def get_cleaned_data():
     champion_stats = pd.merge(champion_wins, total_played, on='Champion')
     champion_stats['Win Rate'] = (champion_stats['Wins'] / champion_stats['Total Games'] * 100).round(2)
 
+    # Decided to create a descriptive label for by combining the champion name
+    # with the sample size (total games). This allows the viewer to immediately gives both me and the viewer
+    # good information on the win rate % and the spread of the top 10 and bottom 10.
     champion_stats['Name_with_Count'] = (
             champion_stats['Champion'] +
             " (" + champion_stats['Total Games'].astype(str) + ")"
@@ -74,12 +78,15 @@ def get_cleaned_data():
     top_10_wins = champion_stats.sort_values(by='Win Rate', ascending=False).head(10)
     bottom_10_wins = champion_stats.sort_values(by='Win Rate', ascending=False).tail(10)
 
+    # Decided to add a dataframe later to further inspect the sample size and therefore
+    # dropping the column Name_with_Count as it's already easy to view in a dataframe
     df_champion_drop = champion_stats.drop(columns=['Name_with_Count'])
 
     df_champions = df_champion_drop[['Champion', 'Wins', 'Win Rate', 'Total Games']].copy()
 
-
     df_champions = df_champions.sort_values(by='Total Games', ascending=False)
+
+#-----------------------------------------GAME STATISTICS---------------------------------------------------
 
     df_duration = df_classic.groupby(['game_id'])[['game_duration', 'game_minutes']].first().reset_index()
 
@@ -92,7 +99,7 @@ def get_cleaned_data():
 
     df_match_agg.columns = ['game_id', 'total_match_kills', 'avg_summoner_level', 'game_minutes']
 
-    # We bin 'summoner_level' to analyze if player experience correlates with match duration.
+    # Decided to bin 'summoner_level' to analyze if player experience correlates with match duration.
     # The bins are strategically chosen to separate new/casual players from 'high-level'
     # veterans, aiming for balanced group sizes based on the dataset distribution.
     bins = [0, 300,700, 3000]
@@ -211,7 +218,7 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
     fig5, ax4 = plt.subplots(figsize=(10, 6))
 
     # Using a regplot to visualize the correlation (trendline) between a champion's
-    # popularity and their win rate. This helps making it even clearer after seeing the scatterplot
+    # popularity and their win rate. The idea is to help make it even clearer after seeing the scatterplot
     sns.regplot(
         data=df_champions,
         x='Total Games',
@@ -263,8 +270,5 @@ def graphs(stats, mode_counts, top_10_wins, bottom_10_wins, df_champions, df_dur
     ax_agg.set_ylabel('Minuter (Duration)')
 
     return fig1, fig2, fig3, fig4, fig5, fig6, fig_agg
-
-
-
 
 
