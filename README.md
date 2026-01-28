@@ -24,12 +24,12 @@ Det rekommenderas att läsa filerna i den ordning de listas nedan för att bäst
   
   **`pages/`**                - Mapp som innehåller sidorna till streamlit
   
-    * **`streamlit.py`**          - Introduktion, syfte och bakgrund till projektet.
-    
-    * **`data_cleaning.py`**      - Genomgång av hur datan har tvättats.
-    
-    * **`game.py`**               - Analys och visualisering av matchstatistik.
-    
-    * **`champion.py`**           - Djupdykning i statistik för specifika champions.
-    
-    * **`ml.py`**                 - Visualisering av ML-resultat och Feature Importance.
+   **`streamlit.py`**          - Introduktion, syfte och bakgrund till projektet.
+  
+   **`data_cleaning.py`**      - Genomgång av hur datan har tvättats.
+  
+   **`game.py`**               - Analys och visualisering av matchstatistik.
+  
+   **`champion.py`**           - Djupdykning i statistik för specifika champions.
+  
+   **`ml.py`**                 - Visualisering av ML-resultat och Feature Importance.
