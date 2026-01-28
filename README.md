@@ -17,12 +17,19 @@ Det rekommenderas att läsa filerna i den ordning de listas nedan för att bäst
 **`pipeline.py`**               # Data processing: Inläsning, städning, beräkningar och grafer.
 
 **`ml_data.py`**                # ML-motor: Logik för train/val/test-split samt GridSearch.
+
 **`league_data_fast.csv`**      # Rådata från Kaggle som används i projektet.
+
 **`requirements.txt`**          # Lista över nödvändiga Python-bibliotek (t.ex. Scikit-learn, Seaborn).
 
 **`pages/`**                # (rena sidor som anropar funktioner)
+
 **`streamlit.py`**          # Introduktion, syfte och bakgrund till projektet.
+
 **`data_cleaning.py`**      # Genomgång av hur datan har tvättats.
+
 **`game.py`**               # Analys och visualisering av matchstatistik.
+
 **`champion.py`**           # Djupdykning i statistik för specifika champions.
+
 **`ml.py`**                 # Visualisering av ML-resultat och Feature Importance.
