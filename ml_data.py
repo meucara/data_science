@@ -139,6 +139,7 @@ def get_ml_results(df_classic, selected_features=None):
 
     # Training the model and retrieving the columns list for the previous mentioned cache.
     grid_search = run_grid_search(X_train, y_train, X_train.columns.tolist())
+    # Choosing the best estimator
     best_rf = grid_search.best_estimator_
 
     # Accuracy
