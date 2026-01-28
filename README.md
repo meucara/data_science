@@ -12,9 +12,9 @@ Målet är att analysera, visualisera och applicera ML för att skapa förståel
 Det rekommenderas att läsa filerna i den ordning de listas nedan för att bäst förstå dataflödet.
 
 
-navigator.py              # Huvudfilen som kör Streamlit och hanterar sidnavigering.
-pipeline.py               # Data processing: Inläsning, städning, beräkningar och grafer.
-ml_data.py                # ML-motor: Logik för train/val/test-split samt GridSearch.
+`navigator.py`              # Huvudfilen som kör Streamlit och hanterar sidnavigering.
+`pipeline.py`               # Data processing: Inläsning, städning, beräkningar och grafer.
+`ml_data.py`                # ML-motor: Logik för train/val/test-split samt GridSearch.
 league_data_fast.csv      # Rådata från Kaggle som används i projektet.
 requirements.txt          # Lista över nödvändiga Python-bibliotek (t.ex. Scikit-learn, Seaborn).
 
