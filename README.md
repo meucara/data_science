@@ -1,5 +1,4 @@
-# data_science
-**Projektet**
+# Projektet "League of Legends: Dataanalys & Machine Learning"
 
 Detta projekt är skapat för att utforska och visualisera mönster i League Of Legends-matcher spelade på servrarna EU North & East (EUNE) under 2025.
 
