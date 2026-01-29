@@ -70,10 +70,13 @@ def prepare_ml_data(df_classic):
         how='inner'
     )
 
-
+    # Since both teams have identical columns we use list comprehension on team 1 columns where,
+    # we remove the t1 to have "universal" name. the columns are being prepared for the diff counting.
+    # If col I take away stuff what wouldn't work with difference counting.
     stats_to_diff = [col.replace('t1_', '') for col in team1.columns
                      if col not in ['t1_game_id', 't1_team_id', 't1_win', 't1_game_start_utc']]
-
+    
+    # Using the "universal" list of names and loop through each stat in the list and create it.
     for stat in stats_to_diff:
         merged_df[f'{stat}_diff'] = merged_df[f't1_{stat}'] - merged_df[f't2_{stat}']
 
