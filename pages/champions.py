@@ -66,9 +66,12 @@ else:
 
     st.pyplot(fig4)
 
+st.divider()
+
 st.header("Slutsats")
 st.write(""" En slutsats man kan dra av detta och på nästan all data att det är alltid viktigt att ställa datan emot varandra.
 Det räcker inte att blint lite på det första bästa man ser. I detta fall hade det då konstaterats att spelet verkar vara obalanserat.
 Även om det troligtvis är långt ifrån perfekt balanserat kan vi däremot se att trendlinjen pekar på något som vi inte kunde se om vi bara tittade på högst och lägst win rate.
 """)
+
 
